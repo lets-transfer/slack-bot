@@ -1,26 +1,26 @@
-package lets.trasnfer.bot;
+package lets.trasnfer.bot.handler;
+
+import lets.trasnfer.bot.exception.DuplicateHandlerException;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by spoon on 2017. 5. 28..
- */
-public class HandlerRegister {
-	Map<String, Handler> handlers = new HashMap<>();
+public class MessageDispatcher {
 
-	public void addHandler() {
-		handlers.put("날씨", new WeatherHandler());
-		handlers.put("환율", new CurrencyHandler());
+	private final Map<String, MessageHandler> handlers = new HashMap<>();
+
+	public void addHandler(String keyword, MessageHandler messageHandler) {
+		if (handlers.containsKey(keyword)) {
+			throw new DuplicateHandlerException("Keyword already registered: " + keyword);
+		}
+		handlers.put(keyword, messageHandler);
 	}
-
 
 	public void getHandleMessage(String text) {
 		String[] split = text.split(" "); // 환율 USD, 날씨 서울
-
-		Handler handler = handlers.get(split[0]);
+		MessageHandler handler = handlers.get(split[0]);
 
 		handler.handle(text);  //
-
 	}
+
 }

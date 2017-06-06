@@ -1,6 +1,7 @@
 package lets.trasnfer.bot.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lets.trasnfer.bot.handler.MessageDispatcher;
 import lets.trasnfer.bot.websocket.vo.Message;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
@@ -8,10 +9,13 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 class SlackMessageHandler implements WebSocketHandler {
-	private final ObjectMapper objectMapper;
 
-	SlackMessageHandler() {
+	private final ObjectMapper objectMapper;
+	private final MessageDispatcher dispatcher;
+
+	SlackMessageHandler(MessageDispatcher dispatcher) {
 		this.objectMapper = new ObjectMapper();
+		this.dispatcher = dispatcher;
 	}
 
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {

@@ -1,6 +1,7 @@
 package lets.trasnfer.bot.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lets.trasnfer.bot.handler.MessageDispatcher;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
@@ -16,9 +17,13 @@ import java.util.HashMap;
 
 public class SlackWebSocketConnector {
 
+	private MessageDispatcher dispatcher;
+
 	private String url;
 
-	public void initialize() throws IOException {
+	public void initialize(MessageDispatcher dispatcher) throws IOException {
+		this.dispatcher = dispatcher;
+
 		// 1. 인증 받는다 https://slack.com/api/rtm.connect
 		NameValuePair formParams = new BasicNameValuePair("token", "xxxx-xxxxxxx");
 		Response response = Request.Post("https://slack.com/api/rtm.connect")
@@ -40,7 +45,7 @@ public class SlackWebSocketConnector {
 				sslContextFactory);
 
 		WebSocketClient client = new JettyWebSocketClient(webSocketClient);
-		WebSocketHandler handler = new SlackMessageHandler();
+		WebSocketHandler handler = new SlackMessageHandler(dispatcher);
 		WebSocketConnectionManager connectionManager = new WebSocketConnectionManager(client, handler, url);
 		connectionManager.start();
 	}
