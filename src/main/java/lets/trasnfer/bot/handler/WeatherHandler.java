@@ -1,11 +1,12 @@
 package lets.trasnfer.bot.handler;
 
 import lets.trasnfer.bot.websocket.vo.Message;
+import lets.trasnfer.bot.websocket.vo.ResponseMessage;
 
 public class WeatherHandler implements MessageHandler {
 	@Override
-	public Message handle(Message message) {
-		Message response = new Message();
+	public ResponseMessage handle(Message message) {
+		ResponseMessage response = new ResponseMessage();
 
 		response.setChannel(message.getChannel());
 		response.setType(message.getType());

@@ -38,7 +38,7 @@ class SlackMessageHandler implements WebSocketHandler {
 		log.debug("Message : {} ", message);
 
 		if (message.ofType("message")) {
-			Message response = dispatcher.getHandleMessage(message);
+			ResponseMessage response = dispatcher.getHandleMessage(message);
 			session.sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
 		}
 	}

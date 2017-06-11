@@ -20,15 +20,16 @@ public class MessageDispatcher {
 		handlers.put(keyword, messageHandler);
 	}
 
-	public Message getHandleMessage(Message message) {
+	public ResponseMessage getHandleMessage(Message message) {
 		String text = message.getText();
 		String[] split = text.split(" "); // 환율 USD, 날씨 서울
 		MessageHandler handler = handlers.get(split[0]);
 
 		if (handler == null) {
 			log.info("handler not found for message : {}", text);
-			Message response = new Message();
+			ResponseMessage response = new ResponseMessage();
 			response.setChannel(message.getChannel());
+			response.setType("message");
 			response.setText("알 수 없는 명령어입니다.");
 
 			return response;
