@@ -1,6 +1,7 @@
 package lets.trasnfer.bot.handler;
 
 import lets.trasnfer.bot.exception.DuplicateHandlerException;
+import lets.trasnfer.bot.websocket.vo.Message;
 import lets.trasnfer.bot.websocket.vo.ResponseMessage;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,16 +20,17 @@ public class MessageDispatcher {
 		handlers.put(keyword, messageHandler);
 	}
 
-	public ResponseMessage getHandleMessage(String text) {
+	public Message getHandleMessage(Message message) {
+		String text = message.getText();
 		String[] split = text.split(" "); // 환율 USD, 날씨 서울
 		MessageHandler handler = handlers.get(split[0]);
 
 		if (handler == null) {
 			log.info("handler not found for message : {}", text);
-			return new ResponseMessage("핸들러를 찾을 수 없습니다 T.T");
+			return message;
 		}
 
-		return handler.handle(text);
+		return handler.handle(message);
 	}
 
 }

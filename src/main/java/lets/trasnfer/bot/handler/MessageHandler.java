@@ -1,7 +1,7 @@
 package lets.trasnfer.bot.handler;
 
-import lets.trasnfer.bot.websocket.vo.ResponseMessage;
+import lets.trasnfer.bot.websocket.vo.Message;
 
 public interface MessageHandler {
-	ResponseMessage handle(String message);
+	Message handle(Message message);
 }
