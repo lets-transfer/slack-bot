@@ -9,7 +9,26 @@ repositories {
     mavenCentral()
 }
 
+List logging= [
+        "org.slf4j:jcl-over-slf4j:1.7.24",
+        "ch.qos.logback:logback-classic:1.2.1"
+]
+
+configurations {
+    // replaced with jcl-over-slf4j
+    all*.exclude group: 'commons-logging', module: 'commons-logging'
+    // replaced with log4j-over-slf4j
+    all*.exclude group: 'log4j', module: 'log4j'
+}
+
+
 dependencies {
+    compile logging
+
+    // lombok
+    compile 'org.projectlombok:lombok:1.16.10'
+
+
     compile 'org.springframework:spring-webmvc:4.3.8.RELEASE'
     compile 'org.springframework:spring-websocket:4.3.8.RELEASE'
 
