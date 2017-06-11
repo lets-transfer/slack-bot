@@ -1,8 +1,7 @@
 package lets.trasnfer.bot.handler;
 
-/**
- * Created by spoon on 2017. 5. 28..
- */
+import lets.trasnfer.bot.websocket.vo.ResponseMessage;
+
 public interface MessageHandler {
-	void handle(String message);
+	ResponseMessage handle(String message);
 }

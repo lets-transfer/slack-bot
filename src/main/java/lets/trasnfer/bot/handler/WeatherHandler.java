@@ -1,11 +1,10 @@
 package lets.trasnfer.bot.handler;
 
-/**
- * Created by spoon on 2017. 5. 28..
- */
+import lets.trasnfer.bot.websocket.vo.ResponseMessage;
+
 public class WeatherHandler implements MessageHandler {
 	@Override
-	public void handle(String message) {
-
+	public ResponseMessage handle(String message) {
+		return new ResponseMessage("날씨정보를 가져옵니다"+message);
 	}
 }

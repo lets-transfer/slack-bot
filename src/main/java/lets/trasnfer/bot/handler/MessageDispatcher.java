@@ -1,10 +1,13 @@
 package lets.trasnfer.bot.handler;
 
 import lets.trasnfer.bot.exception.DuplicateHandlerException;
+import lets.trasnfer.bot.websocket.vo.ResponseMessage;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public class MessageDispatcher {
 
 	private final Map<String, MessageHandler> handlers = new HashMap<>();
@@ -16,11 +19,16 @@ public class MessageDispatcher {
 		handlers.put(keyword, messageHandler);
 	}
 
-	public void getHandleMessage(String text) {
+	public ResponseMessage getHandleMessage(String text) {
 		String[] split = text.split(" "); // 환율 USD, 날씨 서울
 		MessageHandler handler = handlers.get(split[0]);
 
-		handler.handle(text);  //
+		if (handler == null) {
+			log.info("handler not found for message : {}", text);
+			return new ResponseMessage("핸들러를 찾을 수 없습니다 T.T");
+		}
+
+		return handler.handle(text);
 	}
 
 }

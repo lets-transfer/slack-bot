@@ -21,11 +21,11 @@ public class SlackWebSocketConnector {
 
 	private String url;
 
-	public void initialize(MessageDispatcher dispatcher) throws IOException {
+	public void initialize(MessageDispatcher dispatcher, String token) throws IOException {
 		this.dispatcher = dispatcher;
 
 		// 1. 인증 받는다 https://slack.com/api/rtm.connect
-		NameValuePair formParams = new BasicNameValuePair("token", "xxxx-xxxxxxx");
+		NameValuePair formParams = new BasicNameValuePair("token", token);
 		Response response = Request.Post("https://slack.com/api/rtm.connect")
 				.setHeader("Content-Type", "application/x-www-form-urlencoded")
 				.bodyForm(formParams)
