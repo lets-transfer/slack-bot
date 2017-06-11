@@ -11,6 +11,7 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.WebSocketConnectionManager;
 import org.springframework.web.socket.client.jetty.JettyWebSocketClient;
+import org.springframework.web.socket.handler.ExceptionWebSocketHandlerDecorator;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -46,7 +47,8 @@ public class SlackWebSocketConnector {
 
 		WebSocketClient client = new JettyWebSocketClient(webSocketClient);
 		WebSocketHandler handler = new SlackMessageHandler(dispatcher);
-		WebSocketConnectionManager connectionManager = new WebSocketConnectionManager(client, handler, url);
+
+		WebSocketConnectionManager connectionManager = new WebSocketConnectionManager(client, new ExceptionWebSocketHandlerDecorator(handler), url);
 		connectionManager.start();
 	}
 }

@@ -7,15 +7,8 @@
 
   <logger name="org.eclipse" level="WARN" />
   <logger name="org.apache" level="WARN" />
-  <logger name="org.springframework" level="WARN"/>
-  <logger name="org.springframework.web" level="WARN"/>
-  <logger name="org.springframework.security" level="WARN"/>
-  <logger name="org.springframework.cache" level="WARN"/>
-
-
-  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
-    <resetJUL>true</resetJUL>
-  </contextListener>
+  <logger name="org.springframework" level="DEBUG"/>
+  <logger name="org.springframework.web" level="DEBUG"/>
 
   <root level="DEBUG">
     <appender-ref ref="CONSOLE"/>
