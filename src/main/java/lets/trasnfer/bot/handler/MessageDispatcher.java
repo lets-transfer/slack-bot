@@ -27,7 +27,11 @@ public class MessageDispatcher {
 
 		if (handler == null) {
 			log.info("handler not found for message : {}", text);
-			return message;
+			Message response = new Message();
+			response.setChannel(message.getChannel());
+			response.setText("알 수 없는 명령어입니다.");
+
+			return response;
 		}
 
 		return handler.handle(message);
