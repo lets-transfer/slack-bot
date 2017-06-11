@@ -1,6 +1,7 @@
 package lets.trasnfer.bot;
 
 //import lets.trasnfer.bot.handler.CurrencyHandler;
+import lets.trasnfer.bot.handler.CoinCurrencyHandler;
 import lets.trasnfer.bot.handler.MessageDispatcher;
 import lets.trasnfer.bot.handler.WeatherHandler;
 import lets.trasnfer.bot.websocket.SlackWebSocketConnector;
@@ -11,10 +12,11 @@ public class FirstBot {
 	public static void main(String[] args) throws IOException {
 		MessageDispatcher dispatcher = new MessageDispatcher();
 		dispatcher.addHandler("날씨", new WeatherHandler());
+		dispatcher.addHandler("코인", new CoinCurrencyHandler());
 //		dispatcher.addHandler("환율", new CurrencyHandler());
 
 		SlackWebSocketConnector connector = new SlackWebSocketConnector();
-		connector.initialize(dispatcher, "xoxb-189896543783-xWwIU4WOcxoZuUNHHB7Ja5uZ");
+		connector.initialize(dispatcher, "xoxb-195932843410-pRTxhV1GKPQ8M35x0s2HvcZU");
 		connector.connect();
 	}
 }
