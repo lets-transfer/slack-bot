@@ -3,6 +3,10 @@ package lets.trasnfer.bot.handler.dust;
 /**
  * Created by shinkook.kim on 2017-06-14.
  */
+
+// reference https://developers.skplanetx.com/apidoc/pop-view/?guideDocId=11000309&lggId=KOR
+// self test https://developers.skplanetx.com/develop/self-console/
+
 public class Weather {
     class AirQuality {
         class Current {
