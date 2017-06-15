@@ -6,6 +6,10 @@ import lets.trasnfer.bot.websocket.vo.Message;
 import lets.trasnfer.bot.websocket.vo.ResponseMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
+import org.apache.http.protocol.HTTP;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.OkHttpClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
@@ -27,11 +31,11 @@ public class DustHandler implements MessageHandler {
         ResponseMessage response = new ResponseMessage();
         DustResponse dustResponse;
 
-        try {
-            dustResponse = connectServer(message);
-        } catch (IOException e) {
-
-        }
+//        try {
+//            //dustResponse = connectServer(message);
+//        } catch (IOException e) {
+//
+//        }
 
 //        response.setChannel(message.getChannel());
 //        response.setType(message.getType());
@@ -40,7 +44,7 @@ public class DustHandler implements MessageHandler {
         return response;
     }
 
-    private DustResponse connectServer(Message message) throws IOException {
+    private ResponseEntity<String> connectServer(Message message) throws IOException {
         String[] split = message.getText().split(" ");
         log.info("split Test: {}, {}", split[0], split[1]);
 
@@ -51,7 +55,8 @@ public class DustHandler implements MessageHandler {
 
         //Header 추가
         org.springframework.http.HttpHeaders headers = addHeaderForAPI();
-        
+        org.springframework.http.HttpEntity<String> httpEntity = new org.springframework.http.HttpEntity(headers);
+
         //lat , lon 에 대한 정보를 가져와야 함
         //먼지 위치(lat , lon 위치 정보 필요)
         //가산 위도경도: 126.88382980000006 / 37.4758795
@@ -68,10 +73,12 @@ public class DustHandler implements MessageHandler {
         log.info("uri print: " + uri.toString());
 
         RestTemplate restTemplate = new RestTemplate(requestFactory);
-        DustResponse dustResponse = restTemplate.getForObject(uri, DustResponse.class);
+        //DustResponse dustResponse = restTemplate.exchange(uri, HttpMethod.GET,httpEntity, DustResponse.class);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.GET,httpEntity, String.class);
 //        DustResponse dustResponse = new DustResponse();
 
-        return dustResponse;
+        log.info("response: " + responseEntity.toString());
+        return responseEntity;
     }
 
     private org.springframework.http.HttpHeaders addHeaderForAPI() {
