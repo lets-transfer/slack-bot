@@ -1,13 +1,10 @@
 package lets.trasnfer.bot.handler;
 
 import com.squareup.okhttp.OkHttpClient;
-import lets.trasnfer.bot.handler.dust.DustResponse;
 import lets.trasnfer.bot.websocket.vo.Message;
 import lets.trasnfer.bot.websocket.vo.ResponseMessage;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpEntity;
-import org.apache.http.protocol.HTTP;
-import org.springframework.http.HttpHeaders;
+import org.apache.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -25,37 +22,32 @@ import java.net.URI;
 public class DustHandler implements MessageHandler {
 
     String dustapiHost = "apis.skplanetx.com";
+    org.springframework.http.HttpEntity httpEntity;
 
     @Override
     public ResponseMessage handle(Message message) {
         ResponseMessage response = new ResponseMessage();
-        DustResponse dustResponse;
+        //DustResponse dustResponse;
+        ResponseEntity<String> dustResponse;
+        try {
+            dustResponse = connectServer(message);
+        } catch (IOException e) {
 
-//        try {
-//            //dustResponse = connectServer(message);
-//        } catch (IOException e) {
-//
-//        }
-
-//        response.setChannel(message.getChannel());
-//        response.setType(message.getType());
-//        response.setText(dustResponse.getGrade());
+        }
 
         return response;
     }
 
     private ResponseEntity<String> connectServer(Message message) throws IOException {
         String[] split = message.getText().split(" ");
+
         log.info("split Test: {}, {}", split[0], split[1]);
 
         OkHttpClient client = new OkHttpClient();
         ClientHttpRequestFactory requestFactory = new OkHttpClientHttpRequestFactory(client);
-        // Dust server 에 접속
-//        connectDustServer();
 
-        //Header 추가
-        org.springframework.http.HttpHeaders headers = addHeaderForAPI();
-        org.springframework.http.HttpEntity<String> httpEntity = new org.springframework.http.HttpEntity(headers);
+        //Header 추가 app key
+        httpEntity = addHeaderForAPI();
 
         //lat , lon 에 대한 정보를 가져와야 함
         //먼지 위치(lat , lon 위치 정보 필요)
@@ -74,16 +66,18 @@ public class DustHandler implements MessageHandler {
 
         RestTemplate restTemplate = new RestTemplate(requestFactory);
         //DustResponse dustResponse = restTemplate.exchange(uri, HttpMethod.GET,httpEntity, DustResponse.class);
-        ResponseEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.GET,httpEntity, String.class);
-//        DustResponse dustResponse = new DustResponse();
+        ResponseEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, httpEntity, String.class);
 
         log.info("response: " + responseEntity.toString());
         return responseEntity;
     }
 
-    private org.springframework.http.HttpHeaders addHeaderForAPI() {
+    private org.springframework.http.HttpEntity addHeaderForAPI() {
+
         org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
-        headers.add("appKey", "42a9fc24-5097-37c8-b05b-61919d08aac2");
-        return headers;
+        headers.set("appKey", "42a9fc24-5097-37c8-b05b-61919d08aac2");
+        httpEntity = new org.springframework.http.HttpEntity(headers);
+
+        return httpEntity;
     }
 }
