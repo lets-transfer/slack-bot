@@ -11,6 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.text.NumberFormat;
+import java.util.stream.Stream;
 
 public class CoinCurrencyHandler implements MessageHandler {
 	private final String apiHost = "api.coinone.co.kr";
@@ -41,7 +42,7 @@ public class CoinCurrencyHandler implements MessageHandler {
 		NumberFormat numberFormat = NumberFormat.getInstance();
 		String price = response.getCompleteOrders().get(response.getCompleteOrders().size() - 1).getPrice();
 
-		responseMessage.setText("현재 "+split[1]+" 가격은" +numberFormat.format(Long.parseLong(price))+" 입니다.");
+		responseMessage.setText("현재 " + split[1] + " 가격은 " +numberFormat.format(Long.parseLong(price))+" 입니다.");
 
 		return responseMessage;
 	}
