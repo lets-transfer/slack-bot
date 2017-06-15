@@ -51,8 +51,7 @@ public class DustHandler implements MessageHandler {
 
         //Header 추가
         org.springframework.http.HttpHeaders headers = addHeaderForAPI();
-        Http
-
+        
         //lat , lon 에 대한 정보를 가져와야 함
         //먼지 위치(lat , lon 위치 정보 필요)
         //가산 위도경도: 126.88382980000006 / 37.4758795
