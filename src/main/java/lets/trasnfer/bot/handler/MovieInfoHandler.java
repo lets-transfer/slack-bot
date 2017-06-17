@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 public class MovieInfoHandler implements MessageHandler {
     private final String apiHost = "apis.daum.net";
-    private String apiKey = "6963a79ad270c25bd54b32b3ffacd10b";
+    private String apiKey = "abcd";
 
     @Override
     public ResponseMessage handle(Message message) {
