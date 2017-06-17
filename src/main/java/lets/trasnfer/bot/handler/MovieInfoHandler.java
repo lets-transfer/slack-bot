@@ -40,7 +40,9 @@ public class MovieInfoHandler implements MessageHandler {
         ResponseMessage responseMessage = new ResponseMessage();
         responseMessage.setType("message");
         responseMessage.setChannel(message.getChannel());
+        responseMessage.setText(response.getChannel().getTitle());
 
-        return null;
+
+        return responseMessage;
     }
 }
