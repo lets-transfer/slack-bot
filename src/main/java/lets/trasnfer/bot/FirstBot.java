@@ -14,7 +14,7 @@ public class FirstBot {
 		dispatcher.addHandler("영화", new MovieInfoHandler());
 
 		SlackWebSocketConnector connector = new SlackWebSocketConnector();
-		connector.initialize(dispatcher, "abcd");
+		connector.initialize(dispatcher, "xoxb-196254644132-4P6cxcSCS1d7R8GpC3r6YlOz");
 		connector.connect();
 	}
 }

@@ -6,18 +6,15 @@ import lets.trasnfer.bot.websocket.vo.Message;
 import lets.trasnfer.bot.websocket.vo.ResponseMessage;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.OkHttpClientHttpRequestFactory;
+import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.util.Arrays;
 
-/**
- * Created by heeyeon.nah on 2017-06-15.
- */
 public class MovieInfoHandler implements MessageHandler {
     private final String apiHost = "apis.daum.net";
-    private String apiKey = "abcdef";
+    private String apiKey = "6963a79ad270c25bd54b32b3ffacd10b";
 
     @Override
     public ResponseMessage handle(Message message) {
@@ -31,17 +28,18 @@ public class MovieInfoHandler implements MessageHandler {
                 .path("/contents/movie")
                 .queryParam("apikey", apiKey)
                 .queryParam("q", split[1])
+                .queryParam("output", "json")
                 .build()
                 .encode()
                 .toUri();
 
         RestTemplate restTemplate = new RestTemplate(requestFactory);
+//        restTemplate.setMessageConverters(Arrays.asList(new MarshallingHttpMessageConverter()));
         MovieResponse response = restTemplate.getForObject(uri, MovieResponse.class);
 
-        System.out.println(response.getChannel().getQ());
-//        ResponseMessage responseMessage = new ResponseMessage();
-//        responseMessage.setType("message");
-//        responseMessage.setChannel(message.getChannel());
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.setType("message");
+        responseMessage.setChannel(message.getChannel());
 
         return null;
     }

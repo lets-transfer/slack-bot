@@ -28,12 +28,11 @@ dependencies {
     // lombok
     compile 'org.projectlombok:lombok:1.16.10'
 
-    // OKHttp for http client
     compile 'com.squareup.okhttp:okhttp:2.7.5'
-
 
     compile 'org.springframework:spring-webmvc:4.3.8.RELEASE'
     compile 'org.springframework:spring-websocket:4.3.8.RELEASE'
+    compile 'org.springframework:spring-oxm:4.3.8.RELEASE'
 
     compile 'org.apache.httpcomponents:fluent-hc:4.5.3'
     compile 'org.apache.httpcomponents:httpclient:4.5.3'
