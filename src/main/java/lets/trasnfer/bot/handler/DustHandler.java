@@ -61,7 +61,7 @@ public class DustHandler implements MessageHandler {
         URI locationUri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("apis.daum.net")
                 .path("local/geo/addr2coord")
-                .queryParam("apikey", "813ccd1408fbef1b58983cfa55d64f82")
+                .queryParam("apikey", "xxxxx")
                 .queryParam("q", location)
                 .queryParam("output", "json")
                 .build()
@@ -116,7 +116,7 @@ public class DustHandler implements MessageHandler {
 
     private org.springframework.http.HttpHeaders makeDustHeader() {
         org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
-        headers.set("appKey", "131b9b1f-9574-322e-a3bb-2aecb68b7fe4");
+        headers.set("appKey", "xxxx");
         headers.setContentType(MediaType.APPLICATION_JSON);
         return headers;
     }
