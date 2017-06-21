@@ -1,4 +1,4 @@
-package lets.trasnfer.bot.websocket.vo;
+package lets.trasnfer.bot.handler.vo;
 
 import lombok.Data;
 

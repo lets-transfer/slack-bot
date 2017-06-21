@@ -3,8 +3,8 @@ package lets.trasnfer.bot.handler;
 import com.squareup.okhttp.OkHttpClient;
 import lets.trasnfer.bot.handler.dust.dustInfo.DustResponse;
 import lets.trasnfer.bot.handler.dust.location.LocationResponse;
-import lets.trasnfer.bot.websocket.vo.Message;
-import lets.trasnfer.bot.websocket.vo.ResponseMessage;
+import lets.trasnfer.bot.handler.vo.RequestMessage;
+import lets.trasnfer.bot.handler.vo.ResponseMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -28,7 +28,7 @@ public class DustHandler implements MessageHandler {
     LocationResponse locationResponse;
 
     @Override
-    public ResponseMessage handle(Message message) {
+    public ResponseMessage handle(RequestMessage message) {
         ResponseMessage response = new ResponseMessage();
         ResponseEntity<DustResponse> dustResponse = null;
         try {
@@ -75,13 +75,13 @@ public class DustHandler implements MessageHandler {
         return Integer.parseInt(locationResponse.getChannel().getTotalCount()) == 0 ? false : true;
     }
 
-    public ResponseMessage setResponseMessage(ResponseMessage response, Message message) {
+    public ResponseMessage setResponseMessage(ResponseMessage response, RequestMessage message) {
         response.setType("message");
         response.setChannel(message.getChannel());
         return response;
     }
 
-    private ResponseEntity<DustResponse> connectDustServer(Message message) throws IOException {
+    private ResponseEntity<DustResponse> connectDustServer(RequestMessage message) throws IOException {
         String[] split = message.getText().split(" ");
         ResponseEntity<DustResponse> responseEntity;
         log.info("Command Check: {}, {}", split[0], split[1]);
