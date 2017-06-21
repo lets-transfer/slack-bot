@@ -1,6 +1,7 @@
-package lets.trasnfer.bot.handler;
+package lets.trasnfer.bot.handler.coin;
 
 import com.squareup.okhttp.OkHttpClient;
+import lets.trasnfer.bot.handler.MessageHandler;
 import lets.trasnfer.bot.handler.coin.CurrencyResponse;
 import lets.trasnfer.bot.handler.vo.RequestMessage;
 import lets.trasnfer.bot.handler.vo.ResponseMessage;

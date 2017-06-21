@@ -1,6 +1,7 @@
-package lets.trasnfer.bot.handler;
+package lets.trasnfer.bot.handler.movie;
 
 import com.squareup.okhttp.OkHttpClient;
+import lets.trasnfer.bot.handler.MessageHandler;
 import lets.trasnfer.bot.handler.movie.MovieResponse;
 import lets.trasnfer.bot.handler.vo.RequestMessage;
 import lets.trasnfer.bot.handler.vo.ResponseMessage;
