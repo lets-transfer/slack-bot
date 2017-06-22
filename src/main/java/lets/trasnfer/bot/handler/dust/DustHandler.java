@@ -38,12 +38,14 @@ public class DustHandler implements MessageHandler {
             if (inputText.length == 1) {
                 response = setResponseMessage(response, message);
                 response.setText("지역을 입력 하세요");
+                return response;
             }
 
             if (!locationCheck(inputText[1])) {
                 log.info("wrong location");
                 response = setResponseMessage(response, message);
                 response.setText("잘못된 지역을 입력하셨습니다");
+                return response;
             } else {
                 dustResponse = connectDustServer(message);
                 response = setResponseMessage(response, message);
@@ -71,7 +73,7 @@ public class DustHandler implements MessageHandler {
 
         RestTemplate restTemplate = new RestTemplate(requestFactory);
         locationResponse = restTemplate.getForObject(locationUri, LocationResponse.class);
-        log.info("Location Check: " + locationResponse.getChannel().getTotalCount());
+        log.info("Location Check: " + locationResponse.toString());
 
         return Integer.parseInt(locationResponse.getChannel().getTotalCount()) == 0 ? false : true;
     }
