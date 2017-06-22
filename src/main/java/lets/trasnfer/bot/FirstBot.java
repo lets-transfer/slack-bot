@@ -1,6 +1,6 @@
 package lets.trasnfer.bot;
 
-import lets.trasnfer.bot.handler.*;
+import lets.trasnfer.bot.handler.MessageDispatcher;
 import lets.trasnfer.bot.handler.coin.CoinCurrencyHandler;
 import lets.trasnfer.bot.handler.dust.DustHandler;
 import lets.trasnfer.bot.handler.movie.MovieInfoHandler;
@@ -16,8 +16,8 @@ public class FirstBot {
 		dispatcher.addHandler("코인", new CoinCurrencyHandler());
 		dispatcher.addHandler("영화", new MovieInfoHandler());
 
-		SlackWebSocketConnector connector = new SlackWebSocketConnector();
-		connector.initialize(dispatcher, "abcd");
+		SlackWebSocketConnector connector = new SlackWebSocketConnector(dispatcher);
+		connector.initialize();
 		connector.connect();
 	}
 }
