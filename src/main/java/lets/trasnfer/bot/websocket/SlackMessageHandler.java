@@ -32,14 +32,18 @@ class SlackMessageHandler implements WebSocketHandler {
 
 	@Override
 	public void handleMessage(WebSocketSession session, WebSocketMessage<?> webSocketMessage) throws Exception {
-		final String payload = webSocketMessage.getPayload().toString();
-		log.debug("Payload: {}", payload);
-		final RequestMessage message = objectMapper.readValue(payload, RequestMessage.class);
-		log.debug("Message : {} ", message);
+		try {
+			final String payload = webSocketMessage.getPayload().toString();
+			log.debug("Payload: {}", payload);
+			final Message message = objectMapper.readValue(payload, Message.class);
+			log.debug("Message : {} ", message);
 
-		if (message.ofType("request")) {
-			ResponseMessage response = dispatcher.getHandleMessage(message);
-			session.sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
+			if (message.ofType("message")) {
+				ResponseMessage response = dispatcher.getHandleMessage(message);
+				session.sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
+			}
+		} catch(Exception ignored) {
+			log.debug("Exception in handleMessage", ignored);
 		}
 	}
 
