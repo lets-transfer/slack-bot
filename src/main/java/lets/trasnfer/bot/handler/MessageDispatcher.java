@@ -1,8 +1,8 @@
 package lets.trasnfer.bot.handler;
 
 import lets.trasnfer.bot.exception.DuplicateHandlerException;
-import lets.trasnfer.bot.websocket.vo.Message;
-import lets.trasnfer.bot.websocket.vo.ResponseMessage;
+import lets.trasnfer.bot.handler.vo.RequestMessage;
+import lets.trasnfer.bot.handler.vo.ResponseMessage;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -20,7 +20,7 @@ public class MessageDispatcher {
 		handlers.put(keyword, messageHandler);
 	}
 
-	public ResponseMessage getHandleMessage(Message message) {
+	public ResponseMessage getHandleMessage(RequestMessage message) {
 		String text = message.getText();
 		String[] split = text.split(" "); // 환율 USD, 날씨 서울
 		MessageHandler handler = handlers.get(split[0]);

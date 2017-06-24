@@ -1,6 +1,9 @@
 package lets.trasnfer.bot;
 
 import lets.trasnfer.bot.handler.*;
+import lets.trasnfer.bot.handler.coin.CoinCurrencyHandler;
+import lets.trasnfer.bot.handler.dust.DustHandler;
+import lets.trasnfer.bot.handler.movie.MovieInfoHandler;
 import lets.trasnfer.bot.websocket.SlackWebSocketConnector;
 
 import java.io.IOException;

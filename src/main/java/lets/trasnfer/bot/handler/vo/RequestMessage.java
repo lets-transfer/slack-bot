@@ -1,4 +1,4 @@
-package lets.trasnfer.bot.websocket.vo;
+package lets.trasnfer.bot.handler.vo;
 
 import lombok.Data;
 import lombok.ToString;
@@ -7,7 +7,7 @@ import java.util.Objects;
 
 @ToString
 @Data
-public class Message {
+public class RequestMessage {
 	private String type;
 	private String url;
 	private String channel;
