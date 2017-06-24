@@ -47,3 +47,21 @@ dependencies {
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Main-Class': 'lets.trasnfer.bot.LetsTransferBot'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+
+//jar {
+//    manifest {
+//        attributes 'Main-Class': 'lets.trasnfer.bot.LetsTransferBot'
+//    }
+//}
+//
