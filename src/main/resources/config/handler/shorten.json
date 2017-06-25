@@ -1,0 +1,6 @@
+{
+  "scheme": "https",
+  "url": "www.googleapis.com",
+  "path": "/urlshortener/v1/url",
+  "apiKey": "..."
+}
