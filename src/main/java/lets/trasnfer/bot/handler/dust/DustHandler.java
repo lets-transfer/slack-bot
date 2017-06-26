@@ -1,6 +1,7 @@
 package lets.trasnfer.bot.handler.dust;
 
 import com.squareup.okhttp.OkHttpClient;
+import lets.trasnfer.bot.configuration.ConfigurationLoader;
 import lets.trasnfer.bot.handler.MessageHandler;
 import lets.trasnfer.bot.handler.dust.dustInfo.DustResponse;
 import lets.trasnfer.bot.handler.dust.location.LocationResponse;
@@ -24,103 +25,109 @@ import java.net.URI;
 @Slf4j
 public class DustHandler implements MessageHandler {
 
-    String dustapiHost = "apis.skplanetx.com";
-    org.springframework.http.HttpEntity<String> httpEntity;
-    LocationResponse locationResponse;
+	org.springframework.http.HttpEntity<String> httpEntity;
+	LocationResponse locationResponse;
+	DustApiConfiguration dustApiConfiguration;
 
-    @Override
-    public ResponseMessage handle(RequestMessage message) {
-        ResponseMessage response = new ResponseMessage();
-        ResponseEntity<DustResponse> dustResponse = null;
-        try {
-            String inputText[] = message.getText().split(" ");
-            log.info("inputText size: " + inputText.length);
-            if (inputText.length == 1) {
-                response = setResponseMessage(response, message);
-                response.setText("지역을 입력 하세요");
-                return response;
-            }
+	public DustHandler() {
+		this.dustApiConfiguration = ConfigurationLoader.load(DustApiConfiguration.class);
+	}
 
-            if (!locationCheck(inputText[1])) {
-                log.info("wrong location");
-                response = setResponseMessage(response, message);
-                response.setText("잘못된 지역을 입력하셨습니다");
-                return response;
-            } else {
-                dustResponse = connectDustServer(message);
-                response = setResponseMessage(response, message);
-                response.setText("[미세먼지] 수치: " + dustResponse.getBody().getWeather().getDust().get(0).getPm10().getValue() +
-                        " / 등급: " + dustResponse.getBody().getWeather().getDust().get(0).getPm10().getGrade() + " 입니다");
-            }
-        } catch (IOException e) {
-        }
-        return response;
-    }
+	@Override
+	public ResponseMessage handle(RequestMessage message) {
+		ResponseMessage response = new ResponseMessage();
+		ResponseEntity<DustResponse> dustResponse = null;
+		try {
+			String inputText[] = message.getText().split(" ");
+			log.info("inputText size: " + inputText.length);
+			if (inputText.length == 1) {
+				response = setResponseMessage(response, message);
+				response.setText("지역을 입력 하세요");
+				return response;
+			}
 
-    private boolean locationCheck(String location) {
-        OkHttpClient client = new OkHttpClient();
-        ClientHttpRequestFactory requestFactory = new OkHttpClientHttpRequestFactory(client);
+			if (!locationCheck(inputText[1])) {
+				log.info("wrong location");
+				response = setResponseMessage(response, message);
+				response.setText("잘못된 지역을 입력하셨습니다");
+				return response;
+			} else {
+				dustResponse = connectDustServer(message);
+				response = setResponseMessage(response, message);
+				response.setText("[미세먼지] 수치: " + dustResponse.getBody().getWeather().getDust().get(0).getPm10().getValue() +
+					" / 등급: " + dustResponse.getBody().getWeather().getDust().get(0).getPm10().getGrade() + " 입니다");
+			}
+		} catch (IOException e) {
+			response = new ResponseMessage();
+			response.setText(e.getMessage());
+		}
+		return response;
+	}
 
-        URI locationUri = UriComponentsBuilder.newInstance().scheme("http")
-                .host("apis.daum.net")
-                .path("local/geo/addr2coord")
-                .queryParam("apikey", "xxxxx")
-                .queryParam("q", location)
-                .queryParam("output", "json")
-                .build()
-                .encode()
-                .toUri();
+	private boolean locationCheck(String location) {
+		OkHttpClient client = new OkHttpClient();
+		ClientHttpRequestFactory requestFactory = new OkHttpClientHttpRequestFactory(client);
 
-        RestTemplate restTemplate = new RestTemplate(requestFactory);
-        locationResponse = restTemplate.getForObject(locationUri, LocationResponse.class);
-        log.info("Location Check: " + locationResponse.toString());
+		URI locationUri = UriComponentsBuilder.newInstance().scheme("http")
+			.host(dustApiConfiguration.locUrl())
+			.path(dustApiConfiguration.locPath())
+			.queryParam("apikey", dustApiConfiguration.locApiKey())
+			.queryParam("q", location)
+			.queryParam("output", "json")
+			.build()
+			.encode()
+			.toUri();
 
-        return Integer.parseInt(locationResponse.getChannel().getTotalCount()) == 0 ? false : true;
-    }
+		RestTemplate restTemplate = new RestTemplate(requestFactory);
+		locationResponse = restTemplate.getForObject(locationUri, LocationResponse.class);
+		log.info("Location Check: " + locationResponse.toString());
 
-    public ResponseMessage setResponseMessage(ResponseMessage response, RequestMessage message) {
-        response.setType("message");
-        response.setChannel(message.getChannel());
-        return response;
-    }
+		return Integer.parseInt(locationResponse.getChannel().getTotalCount()) == 0 ? false : true;
+	}
 
-    private ResponseEntity<DustResponse> connectDustServer(RequestMessage message) throws IOException {
-        String[] split = message.getText().split(" ");
-        ResponseEntity<DustResponse> responseEntity;
-        log.info("Command Check: {}, {}", split[0], split[1]);
+	public ResponseMessage setResponseMessage(ResponseMessage response, RequestMessage message) {
+		response.setType("message");
+		response.setChannel(message.getChannel());
+		return response;
+	}
 
-        OkHttpClient client = new OkHttpClient();
-        ClientHttpRequestFactory requestFactory = new OkHttpClientHttpRequestFactory(client);
+	private ResponseEntity<DustResponse> connectDustServer(RequestMessage message) throws IOException {
+		String[] split = message.getText().split(" ");
+		ResponseEntity<DustResponse> responseEntity;
+		log.info("Command Check: {}, {}", split[0], split[1]);
 
-        //lat , lon 에 대한 정보를 가져와야 함
-        URI uri = UriComponentsBuilder.newInstance().scheme("http")
-                .host(dustapiHost)
-                .path("weather/dust")
-                .queryParam("lon", locationResponse.getChannel().getItem().get(0).getLng())
-                .queryParam("lat", locationResponse.getChannel().getItem().get(0).getLat())
-                .queryParam("version", 1)
-                .build()
-                .encode()
-                .toUri();
+		OkHttpClient client = new OkHttpClient();
+		ClientHttpRequestFactory requestFactory = new OkHttpClientHttpRequestFactory(client);
 
-        RestTemplate restTemplate = new RestTemplate(requestFactory);
-        httpEntity = addHeaderForHttpEntity();
+		//lat , lon 에 대한 정보를 가져와야 함
+		URI uri = UriComponentsBuilder.newInstance().scheme("http")
+			.host(dustApiConfiguration.dustUrl())
+			.path(dustApiConfiguration.dustPath())
+			.queryParam("lon", locationResponse.getChannel().getItem().get(0).getLng())
+			.queryParam("lat", locationResponse.getChannel().getItem().get(0).getLat())
+			.queryParam("version", 1)
+			.build()
+			.encode()
+			.toUri();
 
-        //RestTemplate 로 HTTP request 전달
-        responseEntity = restTemplate.exchange(uri, HttpMethod.GET, httpEntity, DustResponse.class);
-        log.info("Dust response: " + responseEntity.toString());
-        return responseEntity;
-    }
+		RestTemplate restTemplate = new RestTemplate(requestFactory);
+		httpEntity = addHeaderForHttpEntity();
 
-    private org.springframework.http.HttpEntity addHeaderForHttpEntity() {
-        httpEntity = new org.springframework.http.HttpEntity<String>(makeDustHeader());
-        return httpEntity;
-    }
+		//RestTemplate 로 HTTP request 전달
+		responseEntity = restTemplate.exchange(uri, HttpMethod.GET, httpEntity, DustResponse.class);
+		log.info("Dust response: " + responseEntity.toString());
+		return responseEntity;
+	}
 
-    private org.springframework.http.HttpHeaders makeDustHeader() {
-        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
-        headers.set("appKey", "xxxx");
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        return headers;
-    }
+	private org.springframework.http.HttpEntity addHeaderForHttpEntity() {
+		httpEntity = new org.springframework.http.HttpEntity<String>(makeDustHeader());
+		return httpEntity;
+	}
+
+	private org.springframework.http.HttpHeaders makeDustHeader() {
+		org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+		headers.set("appKey", dustApiConfiguration.dustApiKey());
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		return headers;
+	}
 }
