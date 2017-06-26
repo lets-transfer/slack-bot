@@ -3,8 +3,8 @@ package lets.trasnfer.bot.websocket;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lets.trasnfer.bot.handler.MessageDispatcher;
-import lets.trasnfer.bot.websocket.vo.Message;
-import lets.trasnfer.bot.websocket.vo.ResponseMessage;
+import lets.trasnfer.bot.handler.vo.RequestMessage;
+import lets.trasnfer.bot.handler.vo.ResponseMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -32,14 +32,18 @@ class SlackMessageHandler implements WebSocketHandler {
 
 	@Override
 	public void handleMessage(WebSocketSession session, WebSocketMessage<?> webSocketMessage) throws Exception {
-		final String payload = webSocketMessage.getPayload().toString();
-		log.debug("Payload: {}", payload);
-		final Message message = objectMapper.readValue(payload, Message.class);
-		log.debug("Message : {} ", message);
+		try {
+			final String payload = webSocketMessage.getPayload().toString();
+			log.debug("Payload: {}", payload);
+			final RequestMessage message = objectMapper.readValue(payload, RequestMessage.class);
+			log.debug("Message : {} ", message);
 
-		if (message.ofType("message")) {
-			ResponseMessage response = dispatcher.getHandleMessage(message);
-			session.sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
+			if (message.ofType("message")) {
+				ResponseMessage response = dispatcher.getHandleMessage(message);
+				session.sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
+			}
+		} catch(Exception ignored) {
+			log.debug("Exception in handleMessage", ignored);
 		}
 	}
 

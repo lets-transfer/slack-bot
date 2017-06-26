@@ -1,4 +1,4 @@
-package lets.trasnfer.bot.handler.dust;
+package lets.trasnfer.bot.handler.dust.dustInfo;
 
 import lombok.Data;
 
