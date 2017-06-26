@@ -1,4 +1,4 @@
-package lets.trasnfer.bot.handler.dust.dustInfo;
+package lets.trasnfer.bot.handler.dust;
 
 import lombok.Data;
 
@@ -9,10 +9,7 @@ import java.util.List;
  */
 @Data
 public class DustResponse {
-    Common common;
-    List<Dust> dust;
-    Pm10 pm10;
     Result result;
-    Station station;
+    Common common;
     Weather weather;
 }

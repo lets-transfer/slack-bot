@@ -1,10 +1,9 @@
-package lets.trasnfer.bot.handler.coin;
+package lets.trasnfer.bot.handler;
 
 import com.squareup.okhttp.OkHttpClient;
-import lets.trasnfer.bot.handler.MessageHandler;
 import lets.trasnfer.bot.handler.coin.CurrencyResponse;
-import lets.trasnfer.bot.handler.vo.RequestMessage;
-import lets.trasnfer.bot.handler.vo.ResponseMessage;
+import lets.trasnfer.bot.websocket.vo.Message;
+import lets.trasnfer.bot.websocket.vo.ResponseMessage;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.OkHttpClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
@@ -12,12 +11,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.text.NumberFormat;
+import java.util.stream.Stream;
 
 public class CoinCurrencyHandler implements MessageHandler {
 	private final String apiHost = "api.coinone.co.kr";
 
 	@Override
-	public ResponseMessage handle(RequestMessage message) {
+	public ResponseMessage handle(Message message) {
 		String[] split = message.getText().split(" ");
 
 		OkHttpClient client = new OkHttpClient();

@@ -1,37 +1,32 @@
-package lets.trasnfer.bot.handler.movie;
+package lets.trasnfer.bot.handler;
 
 import com.squareup.okhttp.OkHttpClient;
-import lets.trasnfer.bot.handler.MessageHandler;
-import lets.trasnfer.bot.configuration.ConfigurationLoader;
-import lets.trasnfer.bot.handler.movie.MovieApiConfiguration;
 import lets.trasnfer.bot.handler.movie.MovieResponse;
-import lets.trasnfer.bot.handler.vo.RequestMessage;
-import lets.trasnfer.bot.handler.vo.ResponseMessage;
+import lets.trasnfer.bot.websocket.vo.Message;
+import lets.trasnfer.bot.websocket.vo.ResponseMessage;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.OkHttpClientHttpRequestFactory;
+import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import java.net.URI;
+import java.util.Arrays;
 
 public class MovieInfoHandler implements MessageHandler {
-	private final MovieApiConfiguration configuration;
-
-	public MovieInfoHandler() {
-		this.configuration = ConfigurationLoader.load(MovieApiConfiguration.class);
-	}
+    private final String apiHost = "apis.daum.net";
+    private String apiKey = "6963a79ad270c25bd54b32b3ffacd10b";
 
     @Override
-    public ResponseMessage handle(RequestMessage message) {
+    public ResponseMessage handle(Message message) {
         String[] split = message.getText().split(" ");
 
         OkHttpClient client = new OkHttpClient();
         ClientHttpRequestFactory requestFactory = new OkHttpClientHttpRequestFactory(client);
 
         URI uri = UriComponentsBuilder.newInstance().scheme("https")
-				.host(configuration.host())
-				.path(configuration.path())
-				.queryParam("apikey", configuration.apiKey())
+                .host(apiHost)
+                .path("/contents/movie")
+                .queryParam("apikey", apiKey)
                 .queryParam("q", split[1])
                 .queryParam("output", "json")
                 .build()
