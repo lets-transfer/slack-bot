@@ -15,4 +15,11 @@ public class DustResponse {
     Result result;
     Station station;
     Weather weather;
+
+    public Pm10 getDustValue(){
+		return getWeather().getDust().get(0).getPm10();
+	}
+    public Pm10 getDustGrade(){
+		return getWeather().getDust().get(0).getPm10();
+	}
 }

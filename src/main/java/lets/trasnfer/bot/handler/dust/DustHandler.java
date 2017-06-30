@@ -28,6 +28,7 @@ public class DustHandler implements MessageHandler {
 	org.springframework.http.HttpEntity<String> httpEntity;
 	LocationResponse locationResponse;
 	DustApiConfiguration dustApiConfiguration;
+	static final int OK = 9200;
 
 	public DustHandler() {
 		this.dustApiConfiguration = ConfigurationLoader.load(DustApiConfiguration.class);
@@ -37,8 +38,9 @@ public class DustHandler implements MessageHandler {
 	public ResponseMessage handle(RequestMessage message) {
 		ResponseMessage response = new ResponseMessage();
 		ResponseEntity<DustResponse> dustResponse = null;
+		String[] inputText = message.getText().split(" ");
+
 		try {
-			String inputText[] = message.getText().split(" ");
 			log.info("inputText size: " + inputText.length);
 			if (inputText.length == 1) {
 				response = setResponseMessage(response, message);
@@ -46,29 +48,38 @@ public class DustHandler implements MessageHandler {
 				return response;
 			}
 
-			if (!locationCheck(inputText[1])) {
-				log.info("wrong location");
+			if (!connectLocationServer(inputText[1])) {
 				response = setResponseMessage(response, message);
 				response.setText("잘못된 지역을 입력하셨습니다");
 				return response;
 			} else {
 				dustResponse = connectDustServer(message);
-				response = setResponseMessage(response, message);
-				response.setText("[미세먼지] 수치: " + dustResponse.getBody().getWeather().getDust().get(0).getPm10().getValue() +
-					" / 등급: " + dustResponse.getBody().getWeather().getDust().get(0).getPm10().getGrade() + " 입니다");
+				response = checkDustInfoResp(dustResponse, response,message);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			response = new ResponseMessage();
 			response.setText(e.getMessage());
 		}
 		return response;
 	}
 
-	private boolean locationCheck(String location) {
+	private ResponseMessage checkDustInfoResp(ResponseEntity<DustResponse> dustResponse, ResponseMessage response, RequestMessage  message) {
+		if (dustResponse.getBody().getResult().getCode() != OK) {
+			response = setResponseMessage(response, message);
+			response.setText("Server Error: " + dustResponse.getBody().getResult().getCode());
+		} else {
+			response = setResponseMessage(response, message);
+			response.setText("[미세먼지] 수치: " + dustResponse.getBody().getDustValue().getValue() +
+				" / 등급: " + dustResponse.getBody().getDustGrade().getGrade() + " 입니다");
+		}
+		return response;
+	}
+
+	private boolean connectLocationServer(String location) {
 		OkHttpClient client = new OkHttpClient();
 		ClientHttpRequestFactory requestFactory = new OkHttpClientHttpRequestFactory(client);
 
-		URI locationUri = UriComponentsBuilder.newInstance().scheme("http")
+		URI locationUri = UriComponentsBuilder.newInstance().scheme(dustApiConfiguration.scheme())
 			.host(dustApiConfiguration.locUrl())
 			.path(dustApiConfiguration.locPath())
 			.queryParam("apikey", dustApiConfiguration.locApiKey())
@@ -80,7 +91,7 @@ public class DustHandler implements MessageHandler {
 
 		RestTemplate restTemplate = new RestTemplate(requestFactory);
 		locationResponse = restTemplate.getForObject(locationUri, LocationResponse.class);
-		log.info("Location Check: " + locationResponse.toString());
+		log.info("Location response: " + locationResponse.toString());
 
 		return Integer.parseInt(locationResponse.getChannel().getTotalCount()) == 0 ? false : true;
 	}
@@ -92,15 +103,12 @@ public class DustHandler implements MessageHandler {
 	}
 
 	private ResponseEntity<DustResponse> connectDustServer(RequestMessage message) throws IOException {
-		String[] split = message.getText().split(" ");
 		ResponseEntity<DustResponse> responseEntity;
-		log.info("Command Check: {}, {}", split[0], split[1]);
 
 		OkHttpClient client = new OkHttpClient();
 		ClientHttpRequestFactory requestFactory = new OkHttpClientHttpRequestFactory(client);
 
-		//lat , lon 에 대한 정보를 가져와야 함
-		URI uri = UriComponentsBuilder.newInstance().scheme("http")
+		URI uri = UriComponentsBuilder.newInstance().scheme(dustApiConfiguration.scheme())
 			.host(dustApiConfiguration.dustUrl())
 			.path(dustApiConfiguration.dustPath())
 			.queryParam("lon", locationResponse.getChannel().getItem().get(0).getLng())
