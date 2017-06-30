@@ -58,6 +58,17 @@ task fatJar(type: Jar) {
     with jar
 }
 
+//create a jar for IntelliJ
+jar {
+    manifest {
+        attributes  'Main-Class': 'lets.trasnfer.bot.LetsTransferBot'
+    }
+    archiveName 'MyApp.jar'
+    dependsOn configurations.runtime
+    from {
+        configurations.compile.collect {it.isDirectory()? it: zipTree(it)}
+    }
+}
 
 //jar {
 //    manifest {
