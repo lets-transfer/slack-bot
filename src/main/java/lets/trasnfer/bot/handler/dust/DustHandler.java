@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.OkHttpClientHttpRequestFactory;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -29,6 +30,7 @@ public class DustHandler implements MessageHandler {
 	LocationResponse locationResponse;
 	DustApiConfiguration dustApiConfiguration;
 	static final int OK = 9200;
+	RestClientException errCause = null;
 
 	public DustHandler() {
 		this.dustApiConfiguration = ConfigurationLoader.load(DustApiConfiguration.class);
@@ -53,8 +55,14 @@ public class DustHandler implements MessageHandler {
 				response.setText("잘못된 지역을 입력하셨습니다");
 				return response;
 			} else {
-				dustResponse = connectDustServer(message);
-				response = checkDustInfoResp(dustResponse, response,message);
+
+				try {
+					dustResponse = connectDustServer(message, response);
+					response = checkDustInfoResp(dustResponse, response, message);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
 			}
 		} catch (Exception e) {
 			response = new ResponseMessage();
@@ -63,10 +71,10 @@ public class DustHandler implements MessageHandler {
 		return response;
 	}
 
-	private ResponseMessage checkDustInfoResp(ResponseEntity<DustResponse> dustResponse, ResponseMessage response, RequestMessage  message) {
-		if (dustResponse.getBody().getResult().getCode() != OK) {
+	private ResponseMessage checkDustInfoResp(ResponseEntity<DustResponse> dustResponse, ResponseMessage response, RequestMessage message) {
+		if (dustResponse == null) {
 			response = setResponseMessage(response, message);
-			response.setText("Server Error: " + dustResponse.getBody().getResult().getCode());
+			response.setText("Server Error: " + errCause.getMessage());
 		} else {
 			response = setResponseMessage(response, message);
 			response.setText("[미세먼지] 수치: " + dustResponse.getBody().getDustValue().getValue() +
@@ -102,8 +110,8 @@ public class DustHandler implements MessageHandler {
 		return response;
 	}
 
-	private ResponseEntity<DustResponse> connectDustServer(RequestMessage message) throws IOException {
-		ResponseEntity<DustResponse> responseEntity;
+	private ResponseEntity<DustResponse> connectDustServer(RequestMessage message, ResponseMessage response) throws IOException {
+		ResponseEntity<DustResponse> responseEntity = null;
 
 		OkHttpClient client = new OkHttpClient();
 		ClientHttpRequestFactory requestFactory = new OkHttpClientHttpRequestFactory(client);
@@ -122,9 +130,15 @@ public class DustHandler implements MessageHandler {
 		httpEntity = addHeaderForHttpEntity();
 
 		//RestTemplate 로 HTTP request 전달
-		responseEntity = restTemplate.exchange(uri, HttpMethod.GET, httpEntity, DustResponse.class);
-		log.info("Dust response: " + responseEntity.toString());
-		return responseEntity;
+		try {
+			responseEntity = restTemplate.exchange(uri, HttpMethod.GET, httpEntity, DustResponse.class);
+			log.info("Dust response: " + responseEntity.toString());
+		} catch (RestClientException e) {
+			errCause = e;
+			log.info("Occur error");
+		} finally {
+			return responseEntity;
+		}
 	}
 
 	private org.springframework.http.HttpEntity addHeaderForHttpEntity() {
