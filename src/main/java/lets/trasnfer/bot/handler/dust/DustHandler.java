@@ -22,15 +22,15 @@ import java.net.URI;
 
 /**
  * Created by shinkook.kim on 2017-06-13.
+ * DustHandler main
  */
 @Slf4j
 public class DustHandler implements MessageHandler {
 
-	org.springframework.http.HttpEntity<String> httpEntity;
-	LocationResponse locationResponse;
-	DustApiConfiguration dustApiConfiguration;
-	static final int OK = 9200;
-	RestClientException errCause = null;
+
+	private LocationResponse locationResponse;
+	private DustApiConfiguration dustApiConfiguration;
+	private RestClientException errCause = null;
 
 	public DustHandler() {
 		this.dustApiConfiguration = ConfigurationLoader.load(DustApiConfiguration.class);
@@ -39,7 +39,7 @@ public class DustHandler implements MessageHandler {
 	@Override
 	public ResponseMessage handle(RequestMessage message) {
 		ResponseMessage response = new ResponseMessage();
-		ResponseEntity<DustResponse> dustResponse = null;
+		ResponseEntity<DustResponse> dustResponse;
 		String[] inputText = message.getText().split(" ");
 
 		try {
@@ -57,7 +57,7 @@ public class DustHandler implements MessageHandler {
 			} else {
 
 				try {
-					dustResponse = connectDustServer(message, response);
+					dustResponse = connectDustServer();
 					response = checkDustInfoResp(dustResponse, response, message);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -101,17 +101,21 @@ public class DustHandler implements MessageHandler {
 		locationResponse = restTemplate.getForObject(locationUri, LocationResponse.class);
 		log.info("Location response: " + locationResponse.toString());
 
-		return Integer.parseInt(locationResponse.getChannel().getTotalCount()) == 0 ? false : true;
+		if (Integer.parseInt(locationResponse.getChannel().getTotalCount()) != 0)
+			return true;
+		else
+			return false;
 	}
 
-	public ResponseMessage setResponseMessage(ResponseMessage response, RequestMessage message) {
+	private ResponseMessage setResponseMessage(ResponseMessage response, RequestMessage message) {
 		response.setType("message");
 		response.setChannel(message.getChannel());
 		return response;
 	}
 
-	private ResponseEntity<DustResponse> connectDustServer(RequestMessage message, ResponseMessage response) throws IOException {
+	private ResponseEntity<DustResponse> connectDustServer() throws IOException {
 		ResponseEntity<DustResponse> responseEntity = null;
+		org.springframework.http.HttpEntity<String> httpEntity;
 
 		OkHttpClient client = new OkHttpClient();
 		ClientHttpRequestFactory requestFactory = new OkHttpClientHttpRequestFactory(client);
@@ -136,14 +140,12 @@ public class DustHandler implements MessageHandler {
 		} catch (RestClientException e) {
 			errCause = e;
 			log.info("Occur error");
-		} finally {
-			return responseEntity;
 		}
+		return responseEntity;
 	}
 
 	private org.springframework.http.HttpEntity addHeaderForHttpEntity() {
-		httpEntity = new org.springframework.http.HttpEntity<String>(makeDustHeader());
-		return httpEntity;
+		return new org.springframework.http.HttpEntity<>(makeDustHeader());
 	}
 
 	private org.springframework.http.HttpHeaders makeDustHeader() {
