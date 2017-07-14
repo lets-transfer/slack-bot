@@ -101,10 +101,7 @@ public class DustHandler implements MessageHandler {
 		locationResponse = restTemplate.getForObject(locationUri, LocationResponse.class);
 		log.info("Location response: " + locationResponse.toString());
 
-		if (Integer.parseInt(locationResponse.getChannel().getTotalCount()) != 0)
-			return true;
-		else
-			return false;
+		return locationResponse.checkLocCnt();
 	}
 
 	private ResponseMessage setResponseMessage(ResponseMessage response, RequestMessage message) {
@@ -131,7 +128,7 @@ public class DustHandler implements MessageHandler {
 			.toUri();
 
 		RestTemplate restTemplate = new RestTemplate(requestFactory);
-		httpEntity = addHeaderForHttpEntity();
+		httpEntity = new org.springframework.http.HttpEntity<>(makeDustHeader());
 
 		//RestTemplate 로 HTTP request 전달
 		try {
@@ -144,9 +141,9 @@ public class DustHandler implements MessageHandler {
 		return responseEntity;
 	}
 
-	private org.springframework.http.HttpEntity addHeaderForHttpEntity() {
-		return new org.springframework.http.HttpEntity<>(makeDustHeader());
-	}
+//	private org.springframework.http.HttpEntity<String> addHeaderForHttpEntity() {
+//		return new org.springframework.http.HttpEntity<String>(makeDustHeader());
+//	}
 
 	private org.springframework.http.HttpHeaders makeDustHeader() {
 		org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
