@@ -39,9 +39,13 @@ class DustHandlerTest extends Specification {
         dispatcher.addHandler("먼지", handler)
 
         RequestMessage message = new RequestMessage()
-        message.setText("테스트 파라미터")
+        message.setText("먼지 가산")
+        DustHandler handle = new DustHandler()
 
-        DustHandler handle = new DustHandlerTest();
+        when:
+        dispatcher.getHandleMessage(message)
 
+        then:
+        handler.handle(message) >> new ResponseMessage()
     }
 }
