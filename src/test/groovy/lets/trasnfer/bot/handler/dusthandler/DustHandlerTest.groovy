@@ -1,10 +1,15 @@
 package lets.trasnfer.bot.handler.dusthandler
 
+import lets.trasnfer.bot.configuration.ConfigurationLoader
 import lets.trasnfer.bot.handler.MessageDispatcher
 import lets.trasnfer.bot.handler.MessageHandler
+import lets.trasnfer.bot.handler.dust.DustApiConfiguration
 import lets.trasnfer.bot.handler.dust.DustHandler
+import lets.trasnfer.bot.handler.dust.dustInfo.DustResponse
+import lets.trasnfer.bot.handler.dust.location.LocationResponse
 import lets.trasnfer.bot.handler.vo.RequestMessage
 import lets.trasnfer.bot.handler.vo.ResponseMessage
+import org.springframework.http.ResponseEntity
 import spock.lang.Specification
 
 /**
@@ -33,6 +38,20 @@ class DustHandlerTest extends Specification {
 
         then:
         1 * handler.handle(message) >> new ResponseMessage()
+    }
+
+    def "connectDustServer 동작 check"() {
+
+        given:
+        lets.trasnfer.bot.handler.dust.DustHandler dust = new DustHandler()
+        dust.connectLocationServer("가산")
+
+        when:
+        ResponseEntity<DustResponse> resp = dust.connectDustServer()
+
+        then:
+        resp.statusCodeValue == 200
+
     }
 
     def "setResponseMessage 호출 시 ResponseMessage 에 return 값 체크"() {
