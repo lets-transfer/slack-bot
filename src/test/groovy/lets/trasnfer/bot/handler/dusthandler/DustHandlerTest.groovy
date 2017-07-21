@@ -1,14 +1,12 @@
 package lets.trasnfer.bot.handler.dusthandler
 
-import lets.trasnfer.bot.configuration.ConfigurationLoader
 import lets.trasnfer.bot.handler.MessageDispatcher
 import lets.trasnfer.bot.handler.MessageHandler
-import lets.trasnfer.bot.handler.dust.DustApiConfiguration
 import lets.trasnfer.bot.handler.dust.DustHandler
 import lets.trasnfer.bot.handler.dust.dustInfo.DustResponse
-import lets.trasnfer.bot.handler.dust.location.LocationResponse
 import lets.trasnfer.bot.handler.vo.RequestMessage
 import lets.trasnfer.bot.handler.vo.ResponseMessage
+import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import spock.lang.Specification
 
@@ -19,7 +17,9 @@ import spock.lang.Specification
 class DustHandlerTest extends Specification {
     MessageDispatcher dispatcher
     boolean flag
+    RequestMessage message
     ResponseMessage resp
+    DustHandler dust
 
     def setup() {
         this.dispatcher = new MessageDispatcher()
@@ -43,7 +43,7 @@ class DustHandlerTest extends Specification {
     def "connectDustServer 동작 check"() {
 
         given:
-        lets.trasnfer.bot.handler.dust.DustHandler dust = new DustHandler()
+        dust = new DustHandler()
         dust.connectLocationServer("가산")
 
         when:
@@ -57,8 +57,8 @@ class DustHandlerTest extends Specification {
     def "setResponseMessage 호출 시 ResponseMessage 에 return 값 체크"() {
 
         given:
-        RequestMessage message = new RequestMessage()
-        lets.trasnfer.bot.handler.dust.DustHandler dust = new DustHandler()
+        message = new RequestMessage()
+        dust = new DustHandler()
         resp = new ResponseMessage()
 
         when:
@@ -71,7 +71,7 @@ class DustHandlerTest extends Specification {
 
     def "connectLocationServer 에 parameter 에 대한 return 값 체크"() {
         given:
-        DustHandler dust = new DustHandler()
+        dust = new DustHandler()
 
         when:
         flag = dust.connectLocationServer("가산")
@@ -79,6 +79,33 @@ class DustHandlerTest extends Specification {
         then:
         flag == true
     }
+
+    def "checkDustInfoResp response 확인"() {
+        given:
+        dust = new DustHandler()
+        dust.connectLocationServer("가산")
+        ResponseEntity<DustResponse> dustResponse = dust.connectDustServer()
+        message = new RequestMessage()
+        resp = new ResponseMessage()
+
+        when:
+        resp = dust.checkDustInfoResp(dustResponse, resp, message)
+
+        then:
+        resp.getText().contains("[미세먼지]") == true
+    }
+
+    def "makeDustHeader response 확인"() {
+        given:
+        dust = new DustHandler()
+
+        when:
+        HttpHeaders headers = dust.makeDustHeader()
+
+        then:
+        headers.getAccept() != null
+    }
+
 
     def "DustHandler"() {
         given:
