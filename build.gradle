@@ -55,6 +55,7 @@ dependencies {
 
     compile 'org.cfg4j:cfg4j-core:4.4.0'
 
+    testCompile 'net.bytebuddy:byte-buddy:1.6.4'
 	testCompile 'org.codehaus.groovy:groovy-all:${groovyVersion}'
     testCompile spock
 
