@@ -106,6 +106,36 @@ class DustHandlerTest extends Specification {
         headers.getAccept() != null
     }
 
+    def "handler for Dust 테스트 - split length"() {
+        given:
+        def handler = Mock(lets.trasnfer.bot.handler.dust.DustHandler)
+        dispatcher.addHandler("먼지", handler)
+
+        message = new RequestMessage()
+        message.setText("먼지 가산")
+
+        when:
+        handler.handle(message)
+
+        then:
+        1 * message.getText().split(" ").length == 2
+
+    }
+
+    def "handler for Dust 테스트 - connectLocationServer"() {
+        given:
+        def handler = Mock(lets.trasnfer.bot.handler.dust.DustHandler)
+        dispatcher.addHandler("먼지", handler)
+        message = new RequestMessage()
+        message.setText("먼지 가산")
+
+        when:
+        handler.handle(message)
+
+        then:
+        handler.connectLocationServer("가산") == true
+    }
+
 
     def "DustHandler"() {
         given:
